@@ -1,0 +1,12 @@
+[
+  { "title": "The Pragmatic Programmer", "author": "David Thomas", "year": 1999, "genre": "Programming", "pages": 352, "price": 95.00, "available": true, "tags": ["programming", "best-practices"] },
+  { "title": "Clean Code", "author": "Robert C. Martin", "year": 2008, "genre": "Programming", "pages": 464, "price": 89.90, "available": true, "tags": ["programming", "design"] },
+  { "title": "Designing Data-Intensive Applications", "author": "Martin Kleppmann", "year": 2017, "genre": "Technology", "pages": 616, "price": 145.00, "available": true, "tags": ["databases", "distributed-systems"] },
+  { "title": "Sapiens", "author": "Yuval Noah Harari", "year": 2011, "genre": "History", "pages": 443, "price": 65.00, "available": false, "tags": ["history", "anthropology"] },
+  { "title": "The Lean Startup", "author": "Eric Ries", "year": 2011, "genre": "Business", "pages": 336, "price": 72.50, "available": true, "tags": ["startup", "business"] },
+  { "title": "Atomic Habits", "author": "James Clear", "year": 2018, "genre": "Self-Help", "pages": 320, "price": 60.00, "available": false, "tags": ["productivity", "habits"] },
+  { "title": "The 7 Habits of Highly Effective People", "author": "Stephen R. Covey", "year": 1989, "genre": "Self-Help", "pages": 372, "price": 50.00, "available": true, "tags": ["productivity", "leadership"] },
+  { "title": "Thinking, Fast and Slow", "author": "Daniel Kahneman", "year": 2011, "genre": "Psychology", "pages": 499, "price": 68.00, "available": false, "tags": ["psychology", "decision-making"] },
+  { "title": "1984", "author": "George Orwell", "year": 1949, "genre": "Fiction", "pages": 328, "price": 35.00, "available": true, "tags": ["dystopia", "classic"] },
+  { "title": "Dune", "author": "Frank Herbert", "year": 1965, "genre": "Fiction", "pages": 412, "price": 42.00, "available": true, "tags": ["sci-fi", "epic"] }
+]

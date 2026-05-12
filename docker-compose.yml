@@ -1,0 +1,42 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: mongo-lab
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ChangeMe123!
+      MONGO_INITDB_DATABASE: library
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+      - ./sample-data:/sample-data:ro
+    networks:
+      - mongo-net
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ChangeMe123!
+      ME_CONFIG_MONGODB_URL: mongodb://admin:ChangeMe123!@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: ChangeMe123!
+    depends_on:
+      - mongodb
+    networks:
+      - mongo-net
+
+volumes:
+  mongo-data:
+  mongo-config:
+
+networks:
+  mongo-net:
+    driver: bridge

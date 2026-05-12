@@ -1,0 +1,10 @@
+[
+  { "username": "ali_ahmad", "email": "ali@example.com", "age": 28, "department": "Engineering", "active": true, "joined": "2022-03-15" },
+  { "username": "siti_zubir", "email": "siti@example.com", "age": 34, "department": "Finance", "active": true, "joined": "2020-07-22" },
+  { "username": "raj_kumar", "email": "raj@example.com", "age": 41, "department": "Engineering", "active": false, "joined": "2018-11-03" },
+  { "username": "lim_wei", "email": "lim@example.com", "age": 26, "department": "Marketing", "active": true, "joined": "2023-01-10" },
+  { "username": "nurul_iman", "email": "nurul@example.com", "age": 30, "department": "HR", "active": true, "joined": "2021-05-18" },
+  { "username": "david_tan", "email": "david@example.com", "age": 45, "department": "Engineering", "active": true, "joined": "2017-09-01" },
+  { "username": "amira_zain", "email": "amira@example.com", "age": 29, "department": "Marketing", "active": false, "joined": "2022-12-05" },
+  { "username": "ben_lee", "email": "ben@example.com", "age": 38, "department": "Finance", "active": true, "joined": "2019-04-20" }
+]

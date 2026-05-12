@@ -1,0 +1,8 @@
+[
+  { "sku": "LP-001", "name": "Laptop Pro 14", "category": "Electronics", "price": 5499.00, "stock": 12, "specs": { "ram": "16GB", "storage": "512GB" } },
+  { "sku": "PH-002", "name": "Smartphone X", "category": "Electronics", "price": 2899.00, "stock": 45, "specs": { "ram": "8GB", "storage": "256GB" } },
+  { "sku": "HD-003", "name": "Wireless Headphones", "category": "Electronics", "price": 449.00, "stock": 78, "specs": { "battery": "30h", "anc": true } },
+  { "sku": "CH-004", "name": "Ergonomic Chair", "category": "Furniture", "price": 1299.00, "stock": 8, "specs": { "material": "mesh", "warranty": "5y" } },
+  { "sku": "DK-005", "name": "Standing Desk", "category": "Furniture", "price": 1899.00, "stock": 5, "specs": { "height_range": "70-120cm" } },
+  { "sku": "KB-006", "name": "Mechanical Keyboard", "category": "Electronics", "price": 599.00, "stock": 0, "specs": { "switch": "brown", "layout": "tkl" } }
+]
