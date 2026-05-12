@@ -1,8 +1,11 @@
 # Documentation
 
-This folder contains all course documentation for the **MongoDB Database and Security**
-one-day training. Material is split between the trainer-facing slide deck and
-participant-facing lab guides.
+This folder contains all participant-facing course documentation for the
+**MongoDB Database and Security** one-day training: setup guides, hands-on lab
+guides, and quick-reference material.
+
+> **Note**: The trainer slide deck is delivered separately and is not stored
+> in this repository.
 
 ## Documentation Structure
 
@@ -13,7 +16,7 @@ to make sure your environment works before the session begins.
 
 ### [02. Exercises](02-exercises/README.md)
 
-Three standalone lab guides referenced by the slide deck. Each guide includes the
+Three standalone lab guides for the hands-on segments. Each guide includes the
 task list, mongosh commands, expected output, and trainer notes.
 
 ### [03. Reference](03-reference/README.md)
@@ -21,18 +24,13 @@ task list, mongosh commands, expected output, and trainer notes.
 Quick-reference material participants take home: mongosh cheatsheet, security
 hardening checklist, and links to upstream MongoDB docs.
 
-### [Slide Deck](slide.md)
-
-The full 47-slide trainer deck with speaker notes. Source of truth for delivery
-sequence and timing.
-
 ## Quick Start
 
 | You are a... | Start with |
 |--------------|-----------|
 | Participant on Day 0 | [Lab Setup](01-getting-started/02-lab-setup.md) |
 | Participant during class | [Exercises](02-exercises/README.md) |
-| Trainer preparing the session | [Slide Deck](slide.md) |
+| Trainer preparing the session | [Training Checklist](../todo.md) |
 | Looking up a command | [mongosh Cheatsheet](03-reference/01-mongosh-cheatsheet.md) |
 
 ## Finding Information

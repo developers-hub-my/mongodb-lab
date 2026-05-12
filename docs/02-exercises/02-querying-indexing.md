@@ -1,6 +1,6 @@
 # Exercise 2 — Querying and Indexing
 
-**Lab Guide Part 3.** Referenced from Slide 26. **Duration: 25 minutes.**
+**Lab Guide Part 3 (Module 2).** **Duration: 25 minutes.**
 
 Shape query results with sort, projection, and limit. Then create indexes and
 use `explain()` to confirm MongoDB is using them.

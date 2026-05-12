@@ -9,11 +9,12 @@ hands-on exercises covering CRUD, indexing, and security hardening.
 | File / Folder | Purpose |
 |---------------|---------|
 | `docker-compose.yml` | MongoDB 7 + mongo-express stack |
-| `books.json` | Sample data for Module 2 CRUD exercise |
-| `products.json` | Sample data for Module 2 indexing exercise |
-| `users.json` | Sample data for Module 2 indexing and Module 3 user-management exercises |
-| `docs/` | Full course documentation (slides + lab guides) |
-| `docs/slide.md` | 47-slide trainer deck with speaker notes |
+| `sample-data/` | JSON fixtures mounted read-only into the container at `/sample-data` |
+| `sample-data/books.json` | Sample data for Module 2 CRUD exercise |
+| `sample-data/products.json` | Sample data for Module 2 indexing exercise |
+| `sample-data/users.json` | Sample data for Module 2 indexing and Module 3 user-management exercises |
+| `docs/` | Full course documentation (lab guides and reference) |
+| `todo.md` | Trainer prep and delivery checklist |
 
 ## Quick Start
 
@@ -55,7 +56,8 @@ Full course material lives in [`docs/`](docs/README.md):
 - **[Getting Started](docs/01-getting-started/README.md)** — prerequisites, lab setup, loading sample data
 - **[Exercises](docs/02-exercises/README.md)** — three hands-on lab guides (CRUD, querying & indexing, security)
 - **[Reference](docs/03-reference/README.md)** — mongosh cheatsheet and security checklist
-- **[Slide Deck](docs/slide.md)** — full 47-slide deck with trainer notes
+
+> **Note**: The trainer slide deck is delivered separately and is not stored in this repository.
 
 ## Course at a Glance
 

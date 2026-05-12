@@ -1,7 +1,7 @@
 # Security Hardening Checklist
 
-The hardening checklist from Slide 41, expanded with what each item means
-and how to verify it. Use this when reviewing a MongoDB deployment at work.
+The Module 3 hardening checklist, expanded with what each item means and
+how to verify it. Use this when reviewing a MongoDB deployment at work.
 
 ## How to Use This Checklist
 
@@ -112,5 +112,5 @@ Count items marked **Pass**:
 ## Related Documentation
 
 - [Exercise 3 — Security Hardening](../02-exercises/03-security-hardening.md)
-- [Slide Deck](../slide.md) — Slides 29-43 cover the underlying concepts
+- [mongosh Cheatsheet](01-mongosh-cheatsheet.md) — user-management commands
 - [MongoDB Security Manual](https://www.mongodb.com/docs/manual/security/) (upstream)

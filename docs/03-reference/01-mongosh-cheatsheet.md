@@ -196,4 +196,4 @@ edit
 ## Next Steps
 
 - [Security Checklist](02-security-checklist.md)
-- [Slide Deck](../slide.md)
+- [Exercises](../02-exercises/README.md)

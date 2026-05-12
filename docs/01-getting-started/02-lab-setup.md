@@ -2,7 +2,7 @@
 
 Start the Docker stack, confirm both containers are healthy, and connect to
 MongoDB through `mongosh` and `mongo-express`. This is Lab Guide Part 1
-referenced from Slide 13.
+(Module 1 — Lab Setup Check).
 
 ## The Stack
 

@@ -11,8 +11,8 @@ Module 2 exercises assume all three collections exist.
 | `products.json` | `products` | 6 | Exercise 2 (sorting, projection) |
 | `users.json` | `users` | 8 | Exercise 2 (indexing), Exercise 3 (security) |
 
-The files live at the lab root and are mounted read-only into the `mongo-lab`
-container at `/sample-data` (see `docker-compose.yml:15`).
+The files live in `sample-data/` at the lab root and are mounted read-only into
+the `mongo-lab` container at `/sample-data` (see `docker-compose.yml:15`).
 
 ## Import with mongoimport
 

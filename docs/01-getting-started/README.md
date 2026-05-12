@@ -22,4 +22,4 @@ ready for the Module 2 exercises.
 ## Related Documentation
 
 - [Exercises](../02-exercises/README.md) — what you'll do once the lab is running
-- [Slide Deck](../slide.md) — Slide 13 is the synchronized lab-check moment
+- [Training Checklist](../../todo.md) — trainer prep and delivery items

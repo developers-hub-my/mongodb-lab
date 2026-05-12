@@ -1,6 +1,6 @@
 # Exercise 1 — CRUD Practice
 
-**Lab Guide Part 2.** Referenced from Slide 23. **Duration: 20 minutes.**
+**Lab Guide Part 2 (Module 2).** **Duration: 20 minutes.**
 
 Practice the four core operations — create, read, update, delete — against the
 `books` collection.

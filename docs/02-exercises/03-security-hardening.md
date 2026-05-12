@@ -1,6 +1,6 @@
 # Exercise 3 — Security Hardening
 
-**Lab Guide Part 4.** Referenced from Slide 42. **Duration: 30 minutes.**
+**Lab Guide Part 4 (Module 3).** **Duration: 30 minutes.**
 
 Create least-privilege users, verify access controls, take a `mongodump`
 backup, and restore from it. This is the most cognitively demanding exercise
