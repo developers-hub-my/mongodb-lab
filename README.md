@@ -1,5 +1,9 @@
 # MongoDB Database and Security — Lab Kit
 
+[![License](https://img.shields.io/github/license/developers-hub-my/mongodb-lab?style=flat-square)](LICENSE)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Docker](https://img.shields.io/badge/Docker-required-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docs.docker.com/get-docker/)
+
 A self-contained Docker-based lab for the **MongoDB Database and Security** one-day course.
 Participants use the kit to run MongoDB 7 locally, load sample data, and work through three
 hands-on exercises covering CRUD, indexing, and security hardening.
@@ -74,4 +78,5 @@ but not required.
 
 ## License
 
-Internal training material. Not licensed for redistribution.
+Released under the [MIT License](LICENSE). Use, fork, adapt for your own
+training — attribution appreciated.
