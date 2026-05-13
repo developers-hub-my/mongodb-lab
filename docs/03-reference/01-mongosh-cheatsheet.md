@@ -475,27 +475,43 @@ db.changeUserPassword("library_app", passwordPrompt())
 ## Backup and Restore (Run on the Host)
 
 <details open>
-<summary>**mongodump and mongorestore — full and per-database**</summary>
+<summary>**mongodump and mongorestore — full, per-database, and date-stamped**</summary>
+
+The cleanest connection form is `--uri='mongodb://user:pass@host:port'`.
+The split `--username admin -p --authenticationDatabase admin` form is
+still valid and is safer in shared terminals (the `-p` without a value
+prompts interactively).
 
 ```bash
-# Backup all databases
+# Dump everything, date-stamped — the daily-snapshot pattern
 docker exec mongo-lab mongodump \
-  --username admin --password 'ChangeMe123!' --authenticationDatabase admin \
-  --out /backups
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --out=/backups/$(date +%Y%m%d)
 
-# Backup a single database
+# Dump a single database
 docker exec mongo-lab mongodump \
-  --username admin --password 'ChangeMe123!' --authenticationDatabase admin \
-  --db library --out /backups
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --db=library --out=/backups/library
 
-# Restore a database, dropping existing collections first
+# Restore from a dump (source = the inner DB folder)
 docker exec mongo-lab mongorestore \
-  --username admin --password 'ChangeMe123!' --authenticationDatabase admin \
-  --db library --drop /backups/library
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --db=library /backups/library/library
+
+# Restore and overwrite — drops target collections before importing
+docker exec mongo-lab mongorestore \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --drop --db=library /backups/library/library
 ```
 
+**Path note**: `mongodump --out=/backups/library --db=library` creates
+`/backups/library/library/{books,products,users}.bson`. The restore
+source path is the **inner** folder — `/backups/library/library` — not
+the `--out` target.
+
 For a native install, drop the `docker exec mongo-lab` prefix and run
-`mongodump` / `mongorestore` directly on the host.
+`mongodump` / `mongorestore` directly on the host. Adjust `localhost` if
+you're connecting to a remote server.
 
 </details>
 

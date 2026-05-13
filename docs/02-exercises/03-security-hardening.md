@@ -190,29 +190,49 @@ cluster.
 container (or a `backups/` folder on the host for native installs).
 
 **Hint**: run `mongodump` from the host shell, not inside `mongosh`. It's
-a separate command-line tool. Make the destination folder first.
+a separate command-line tool. The cleanest connection form is the
+`--uri=` flag, which carries credentials and the host in one string.
 
 <details>
 <summary>**Show solution**</summary>
 
-Reconnect as `admin` (the role with backup access) before dumping:
+#### Option A — Dump a single database (what we'll restore from in Task 6)
 
 ```bash
 # Docker lab stack
 docker exec mongo-lab mkdir -p /backups
 
 docker exec mongo-lab mongodump \
-  --username admin --password 'ChangeMe123!' --authenticationDatabase admin \
-  --db library --out /backups
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --db=library --out=/backups/library
 
 # Native install
 mkdir -p backups
 
-mongodump --username admin -p --authenticationDatabase admin \
-  --db library --out backups
+mongodump \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --db=library --out=backups/library
 ```
 
-**Expected output** ends with something like:
+#### Option B — Dump every database (date-stamped for daily snapshots)
+
+```bash
+# Docker lab stack
+docker exec mongo-lab mongodump \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --out=/backups/$(date +%Y%m%d)
+
+# Native install
+mongodump \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --out=backups/$(date +%Y%m%d)
+```
+
+The `$(date +%Y%m%d)` expands on your **host** shell to today's date
+(e.g. `20260513`), so each run lands in a fresh dated folder — the basic
+pattern for "keep N days of backups, prune the rest."
+
+#### Expected output
 
 ```text
 done dumping library.books (10 documents)
@@ -220,19 +240,27 @@ done dumping library.products (6 documents)
 done dumping library.users (8 documents)
 ```
 
-**Verify the dump exists**:
+#### Verify the dump exists
 
 ```bash
-# Docker
-docker exec mongo-lab ls /backups/library
+# Docker — for Option A
+docker exec mongo-lab ls /backups/library/library
 
-# Native
-ls backups/library
+# Native — for Option A
+ls backups/library/library
 # books.bson  books.metadata.json  products.bson  ...
 ```
 
-The dump is a folder per database, with `.bson` (data) and
-`.metadata.json` (indexes + options) files per collection.
+The dump is a folder **per database**, with `.bson` (binary documents)
+and `.metadata.json` (indexes + options) files per collection. Note the
+nested path — `--out=/backups/library` creates `/backups/library/library/`
+because `mongodump` adds its own directory layer named after the database.
+
+> **Tip — `--uri` vs split flags**: `--uri='mongodb://user:pass@host:port'`
+> is the modern form; it also accepts `?authSource=admin&tls=true` query
+> parameters. The older `--username admin -p` form is still valid and is
+> safer in shared terminals (the `-p` flag without a value prompts
+> interactively instead of putting the password in shell history).
 
 </details>
 
@@ -242,10 +270,13 @@ The dump is a folder per database, with `.bson` (data) and
 it from the dump you just took.
 
 **Hint**: drop from inside `mongosh`. Restore from the host shell using
-`mongorestore` with `--drop` to clean up first.
+`mongorestore`. The source path is the **inner** database folder created
+by `mongodump` — `/backups/library/library`, not `/backups/library`.
 
 <details>
 <summary>**Show solution**</summary>
+
+#### Step 1 — Simulate data loss
 
 In `mongosh` as `admin`:
 
@@ -258,22 +289,28 @@ db.books.drop()
 db.books.countDocuments()    // 0
 ```
 
-From the host shell, restore the dump:
+#### Step 2 — Restore from the dump
+
+From the host shell:
 
 ```bash
-# Docker lab stack
+# Docker lab stack — restore the library DB from /backups/library/library
 docker exec mongo-lab mongorestore \
-  --username admin --password 'ChangeMe123!' --authenticationDatabase admin \
-  --db library --drop /backups/library
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --db=library /backups/library/library
 
 # Native install
-mongorestore --username admin -p --authenticationDatabase admin \
-  --db library --drop backups/library
+mongorestore \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --db=library backups/library/library
 ```
 
-The `--drop` flag tells `mongorestore` to drop the target collections
-before restoring — without it, you'd append duplicate documents on
-collections that still exist.
+> **Why the doubled `library/library`**: `mongodump --out=/backups/library`
+> created `/backups/library/`, then nested the database under it as
+> `/backups/library/library/`. `mongorestore` expects to be pointed at
+> the **inner** folder — the one that contains the `.bson` files.
+
+#### Step 3 — Verify
 
 Back in `mongosh`:
 
@@ -281,9 +318,35 @@ Back in `mongosh`:
 db.books.countDocuments()    // 10 (back to the dumped count)
 ```
 
-**The Module 3 takeaway**: a backup is only real if you've actually
-restored from it. You just did. Schedule a restore test once a month at
-work — same way you schedule fire drills.
+#### Variant — Restore and overwrite existing collections (`--drop`)
+
+In step 1 we dropped `books` ourselves, so the restore just adds the
+documents back. In real-life "restore over existing data" — for example,
+after an accidental `updateMany` corrupted half a collection — you want
+`mongorestore` to drop the target collections **before** restoring so
+you don't end up with duplicates:
+
+```bash
+# Docker lab stack
+docker exec mongo-lab mongorestore \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --drop --db=library /backups/library/library
+
+# Native install
+mongorestore \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --drop --db=library backups/library/library
+```
+
+Same source path, with `--drop` added. Try this variant against a populated
+collection to confirm it cleans up before importing.
+
+#### The Module 3 takeaway
+
+A backup is only real if you've actually restored from it. You just did.
+Schedule a restore test **once a month** at work — same way you schedule
+fire drills. Otherwise you'll discover the broken backup on the day you
+need it.
 
 </details>
 
