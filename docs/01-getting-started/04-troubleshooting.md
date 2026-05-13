@@ -171,6 +171,121 @@ If the venue provides workstations with Docker pre-installed (or you ship a
 spare laptop), pre-load the lab kit on it. The stuck participant uses the
 spare; you get back the half-hour you would have lost.
 
+### Plan D — Install MongoDB Natively (No Docker)
+
+When the laptop is too locked down to install Docker at all — no BIOS
+access, group-policy blocks, antivirus refuses — install **MongoDB Community
+Server** directly. The exercises only depend on `mongosh`, so they all still
+work; only the engine underneath changes.
+
+Downloads:
+
+| What | Where |
+|------|-------|
+| MongoDB Community Server | <https://www.mongodb.com/try/download/community> |
+| mongosh (shell) | <https://www.mongodb.com/try/download/shell> |
+| Database Tools (`mongoimport`, `mongodump`, `mongorestore`) | <https://www.mongodb.com/try/download/database-tools> |
+
+> **Tip**: On Windows, the **MongoDB Community Server MSI** installer offers
+> a "Complete" option that bundles `mongosh` and Compass — usually fastest.
+> On macOS and Linux, the package manager paths below pull the same bits.
+
+#### Windows (MSI Installer)
+
+1. Download the MongoDB Community `.msi` from the link above.
+2. Run it → choose **Complete** → tick **"Install MongoDB as a Service"**
+   and **"Run service as Network Service user"**.
+3. Tick **"Install MongoDB Compass"** if you want a GUI (optional —
+   mongo-express isn't part of this path).
+4. After install, MongoDB listens on `localhost:27017` automatically. From
+   PowerShell or Command Prompt:
+
+   ```powershell
+   mongosh
+   ```
+
+   You should land at a `>` prompt with no authentication required.
+
+#### macOS (Homebrew)
+
+```bash
+brew tap mongodb/brew
+brew install mongodb-community@7.0
+brew services start mongodb-community@7.0
+
+# Verify
+mongosh
+```
+
+#### Linux (Ubuntu / Debian)
+
+```bash
+# Import the public key
+curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
+  sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+
+# Add the repo (Ubuntu 22.04 example — adjust codename for other versions)
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] \
+  https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | \
+  sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+
+sudo apt update
+sudo apt install -y mongodb-org
+
+sudo systemctl enable --now mongod
+mongosh
+```
+
+#### Loading Sample Data (Native Install)
+
+The `mongoimport` commands in the lab guides assume the sample files live
+inside the Docker container at `/sample-data`. Native install changes the
+path — point to wherever you cloned the lab kit instead:
+
+```bash
+cd /path/to/mongodb-lab
+
+mongoimport --db library --collection books --jsonArray \
+  --file sample-data/books.json
+
+mongoimport --db library --collection products --jsonArray \
+  --file sample-data/products.json
+
+mongoimport --db library --collection users --jsonArray \
+  --file sample-data/users.json
+```
+
+No `--username` / `--password` / `--authenticationDatabase` flags — the
+default native install has authentication **off**, which is fine for the
+exercises but is exactly what Module 3 tells you never to ship to production.
+
+#### What's Different vs the Docker Path
+
+| Aspect | Docker | Native Install |
+|--------|--------|----------------|
+| Engine | `mongo:7` container | OS-native MongoDB service |
+| Default auth | Enabled (`admin` / `ChangeMe123!`) | **Disabled** — anyone on `localhost` can read/write |
+| mongo-express UI | Yes, on `:8081` | Not included — install separately or use Compass |
+| Connecting | `docker exec -it mongo-lab mongosh -u admin -p` | `mongosh` |
+| Sample data path | `/sample-data/...` inside container | `sample-data/...` on host |
+| Module 3 backup demo | `docker exec mongo-lab mongodump ...` | `mongodump --db library --out backups` from host |
+| Cleanup after course | `docker compose down -v` | Uninstall MongoDB service via OS package manager |
+
+#### Module 3 Adjustments for Native Installs
+
+Module 3 Exercise 3 (Security Hardening) **still works**, but the workflow
+is slightly different:
+
+- The default native install has auth disabled. Step 1 becomes "enable auth"
+  before creating users. Either edit `mongod.conf` to set
+  `security.authorization: enabled` and restart the service, or follow the
+  [MongoDB localhost exception](https://www.mongodb.com/docs/manual/core/localhost-exception/)
+  to bootstrap the first admin user.
+- `mongodump` / `mongorestore` commands drop the `docker exec mongo-lab`
+  prefix and run on the host directly.
+- The Exercise 3 "bonus" reflection about `docker-compose.yml` doesn't
+  apply — substitute a discussion of `mongod.conf` hardening instead.
+
 ## Other Common Issues
 
 | Symptom | Cause | Fix |

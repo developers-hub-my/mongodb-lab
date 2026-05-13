@@ -100,7 +100,9 @@ data visually — but the exercises are designed for `mongosh`.
 | Slow `docker compose up` first time | Image pull on slow network | Run it before the session, not during it |
 
 For deeper diagnosis (especially the virtualization stack), see the
-[full Troubleshooting guide](04-troubleshooting.md).
+[full Troubleshooting guide](04-troubleshooting.md). If Docker simply can't
+be installed on your laptop, jump straight to
+[Plan D: Install MongoDB Natively](04-troubleshooting.md#plan-d--install-mongodb-natively-no-docker).
 
 ## Next Steps
 

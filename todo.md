@@ -99,6 +99,9 @@ instead of letting them stall the whole session
 - [ ] **Plan A** — pair them with someone whose Docker works; they type, peer hosts
 - [ ] **Plan B** — switch them to your pre-staged MongoDB Atlas M0 cluster
 - [ ] **Plan C** — move them to a venue/spare workstation if available
+- [ ] **Plan D** — install MongoDB Community Server natively on their laptop
+      (no Docker needed). Best for participants whose laptop is locked down
+      and who'll keep practising after the course
 
 ## Post-Training (Within 48 Hours)
 

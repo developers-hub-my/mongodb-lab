@@ -28,6 +28,12 @@ Confirm it before the session:
 If `Disabled`, follow [Troubleshooting](04-troubleshooting.md) **before** the
 training day. Resolving BIOS settings often needs IT support, so allow time.
 
+> **No Docker at all?** If your laptop is too locked down to install Docker
+> (IT policy, no BIOS access, antivirus refuses), you can install MongoDB
+> Community Server directly instead. See
+> [Troubleshooting — Plan D: Install MongoDB Natively](04-troubleshooting.md#plan-d--install-mongodb-natively-no-docker).
+> The exercises all still work — only the engine underneath changes.
+
 ## Verification
 
 Open a terminal and run:
