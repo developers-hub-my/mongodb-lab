@@ -485,22 +485,22 @@ prompts interactively).
 ```bash
 # Dump everything, date-stamped — the daily-snapshot pattern
 docker exec mongo-lab mongodump \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --out=/backups/$(date +%Y%m%d)
 
 # Dump a single database
 docker exec mongo-lab mongodump \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --db=library --out=/backups/library
 
 # Restore from a dump (source = the inner DB folder)
 docker exec mongo-lab mongorestore \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --db=library /backups/library/library
 
 # Restore and overwrite — drops target collections before importing
 docker exec mongo-lab mongorestore \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --drop --db=library /backups/library/library
 ```
 

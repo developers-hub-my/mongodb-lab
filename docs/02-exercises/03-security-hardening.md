@@ -203,14 +203,14 @@ a separate command-line tool. The cleanest connection form is the
 docker exec mongo-lab mkdir -p /backups
 
 docker exec mongo-lab mongodump \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --db=library --out=/backups/library
 
 # Native install
 mkdir -p backups
 
 mongodump \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --db=library --out=backups/library
 ```
 
@@ -219,12 +219,12 @@ mongodump \
 ```bash
 # Docker lab stack
 docker exec mongo-lab mongodump \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --out=/backups/$(date +%Y%m%d)
 
 # Native install
 mongodump \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --out=backups/$(date +%Y%m%d)
 ```
 
@@ -256,11 +256,23 @@ and `.metadata.json` (indexes + options) files per collection. Note the
 nested path — `--out=/backups/library` creates `/backups/library/library/`
 because `mongodump` adds its own directory layer named after the database.
 
-> **Tip — `--uri` vs split flags**: `--uri='mongodb://user:pass@host:port'`
-> is the modern form; it also accepts `?authSource=admin&tls=true` query
-> parameters. The older `--username admin -p` form is still valid and is
-> safer in shared terminals (the `-p` flag without a value prompts
-> interactively instead of putting the password in shell history).
+**Two tips worth knowing:**
+
+> **Tip — `?authSource=admin` is not optional**: the `admin` user lives in
+> the `admin` database (set by `MONGO_INITDB_ROOT_USERNAME` in
+> `docker-compose.yml`). Without `?authSource=admin` in the URI, the
+> driver tries to authenticate against the default DB and fails with
+> `AuthenticationFailed`. This is the URI-form equivalent of
+> `--authenticationDatabase admin` in the older split-flag syntax.
+
+The other one:
+
+> **Tip — `--uri` vs split flags**: the `--uri` form is the modern
+> connection style and supports query parameters like
+> `?authSource=admin&tls=true`. The older `--username admin -p` form is
+> still valid and is safer in shared terminals (the `-p` flag without a
+> value prompts interactively instead of putting the password in shell
+> history).
 
 </details>
 
@@ -296,12 +308,12 @@ From the host shell:
 ```bash
 # Docker lab stack — restore the library DB from /backups/library/library
 docker exec mongo-lab mongorestore \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --db=library /backups/library/library
 
 # Native install
 mongorestore \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --db=library backups/library/library
 ```
 
@@ -329,12 +341,12 @@ you don't end up with duplicates:
 ```bash
 # Docker lab stack
 docker exec mongo-lab mongorestore \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --drop --db=library /backups/library/library
 
 # Native install
 mongorestore \
-  --uri='mongodb://admin:ChangeMe123!@localhost:27017' \
+  --uri='mongodb://admin:ChangeMe123!@localhost:27017/?authSource=admin' \
   --drop --db=library backups/library/library
 ```
 
