@@ -97,7 +97,8 @@ data visually — but the exercises are designed for `mongosh`.
 | `MongoNetworkError: ECONNREFUSED 127.0.0.1:27017` (native install) | MongoDB service not running | See [Troubleshooting](04-troubleshooting.md#mongonetworkerror-econnrefused-127001-27017) |
 | `Bind for 0.0.0.0:27017 failed: port is already allocated` | Another MongoDB is running | `lsof -i :27017` then stop the process |
 | `mongo-express` keeps restarting | `mongo-lab` isn't healthy yet | Wait 10s and refresh; check `docker logs mongo-lab` |
-| `Authentication failed` in mongosh | Wrong username/password or typed `ChangeMe123` without `!` | Re-check the command; the `!` is part of the password |
+| `Authentication failed` in mongosh (Docker stack) | Wrong username/password or typed `ChangeMe123` without `!` | Re-check the command; the `!` is part of the password |
+| `Authentication failed` in mongosh (native install) | Trying `admin` / `ChangeMe123!` against an MSI/Homebrew/apt install — those credentials only exist in the Docker stack | Native install has **no auth by default**. Just run `mongosh` with no flags. See [Default Authentication](04-troubleshooting.md#default-authentication-or-lack-of-it) |
 | Slow `docker compose up` first time | Image pull on slow network | Run it before the session, not during it |
 
 For deeper diagnosis (especially the virtualization stack), see the

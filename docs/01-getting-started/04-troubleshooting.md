@@ -236,6 +236,108 @@ sudo systemctl enable --now mongod
 mongosh
 ```
 
+#### Default Authentication (or Lack of It)
+
+The most common confusion right after a native install: **what's the default
+username and password?**
+
+**Short answer**: there isn't one. Every native install path (Windows MSI,
+Homebrew, Linux apt repo) ships with **authentication disabled by default**.
+Anyone who can reach `localhost:27017` can read and write every database with
+no credentials.
+
+```bash
+mongosh
+# No -u / -p flags. You just land at a > prompt.
+```
+
+This is **different from this lab kit's Docker setup**, which sets credentials
+explicitly in `docker-compose.yml`:
+
+| Setup | Default credentials |
+|-------|---------------------|
+| Lab kit Docker stack (`docker-compose.yml`) | `admin` / `ChangeMe123!` — set via `MONGO_INITDB_ROOT_*` env vars |
+| MSI installer | None — auth disabled |
+| Homebrew (`mongodb-community@7.0`) | None — auth disabled |
+| Linux apt repo (`mongodb-org`) | None — auth disabled |
+
+If you try to use `admin` / `ChangeMe123!` against a native install, you'll
+get `MongoServerError: Authentication failed` — those credentials simply
+don't exist on this engine.
+
+##### Optional: Enable Auth to Mirror the Docker Setup
+
+If you want a native install that behaves like the Docker lab kit (so the
+exercise commands match exactly), enable auth and create an admin user via
+the **localhost exception**.
+
+Edit `mongod.cfg` / `mongod.conf`:
+
+| OS | Path |
+|----|------|
+| Windows | `C:\Program Files\MongoDB\Server\7.0\bin\mongod.cfg` |
+| macOS (Homebrew, Apple Silicon) | `/opt/homebrew/etc/mongod.conf` |
+| macOS (Homebrew, Intel) | `/usr/local/etc/mongod.conf` |
+| Linux | `/etc/mongod.conf` |
+
+Add or uncomment:
+
+```yaml
+security:
+  authorization: enabled
+```
+
+Restart the service:
+
+| OS | Command |
+|----|---------|
+| Windows (Admin PowerShell) | `Restart-Service MongoDB` |
+| macOS | `brew services restart mongodb-community@7.0` |
+| Linux | `sudo systemctl restart mongod` |
+
+Then use the **localhost exception** to create the first admin user — this
+exception lets one unauthenticated connection through, but only from the
+same machine and only until the first user is created:
+
+```javascript
+// From the same machine running mongod
+mongosh
+
+use admin
+db.createUser({
+  user: "admin",
+  pwd: "ChangeMe123!",
+  roles: [{ role: "root", db: "admin" }]
+})
+exit
+```
+
+After that, every connection requires authentication:
+
+```bash
+mongosh -u admin -p 'ChangeMe123!' --authenticationDatabase admin
+```
+
+Reference:
+<https://www.mongodb.com/docs/manual/core/localhost-exception/>
+
+##### Training Note — This Is Module 3's Opening Demo
+
+The unauthenticated default is **literally the scenario Module 3 warns about**
+("ramai orang deploy MongoDB tanpa auth, jadi viral kat Shodan"). On a native
+install you can use this as a live demo before Exercise 3:
+
+```javascript
+// Run from any terminal on the host — no password
+mongosh
+> show dbs                     // reads everything
+> use library
+> db.books.deleteMany({})      // destroys data, no audit trail
+```
+
+Then enable auth (steps above) before running Exercise 3 itself. The "before
+and after" landing has more impact than reading Slide 30's bullet points.
+
 #### Loading Sample Data (Native Install)
 
 The `mongoimport` commands in the lab guides assume the sample files live
@@ -276,11 +378,11 @@ exercises but is exactly what Module 3 tells you never to ship to production.
 Module 3 Exercise 3 (Security Hardening) **still works**, but the workflow
 is slightly different:
 
-- The default native install has auth disabled. Step 1 becomes "enable auth"
-  before creating users. Either edit `mongod.conf` to set
-  `security.authorization: enabled` and restart the service, or follow the
-  [MongoDB localhost exception](https://www.mongodb.com/docs/manual/core/localhost-exception/)
-  to bootstrap the first admin user.
+- The default native install has auth disabled. Step 1 of the exercise
+  becomes "enable auth and create the first admin user" — see
+  [Default Authentication (or Lack of It)](#default-authentication-or-lack-of-it)
+  above for the exact `mongod.conf` change and the localhost-exception
+  bootstrap.
 - `mongodump` / `mongorestore` commands drop the `docker exec mongo-lab`
   prefix and run on the host directly.
 - The Exercise 3 "bonus" reflection about `docker-compose.yml` doesn't
