@@ -22,6 +22,9 @@ day-of delivery, and post-training follow-up.
 - [ ] Send participants the prerequisites email at least 5 days before
 - [ ] Ask them to confirm Docker Desktop is installed and `docker --version`
       runs successfully
+- [ ] **Ask them to verify BIOS virtualization (VT-x / AMD-V) is enabled** —
+      Task Manager → Performance → CPU on Windows. Single biggest day-of
+      blocker. See [Troubleshooting](docs/01-getting-started/04-troubleshooting.md)
 - [ ] Share the lab kit link or zip ahead of time
 
 ### Materials
@@ -48,8 +51,11 @@ day-of delivery, and post-training follow-up.
       laptop to verify a clean-room start
 - [ ] Top up battery / pack charger
 - [ ] Stage the lab kit zip on a USB drive as a Wi-Fi-failure backup
-- [ ] Review the speaker notes for Slides 13, 23, 26, 42 — the four
-      hands-on moments
+- [ ] Pre-create a **MongoDB Atlas M0 (free tier)** cluster as a backup for
+      participants whose Docker won't run on day. Test the connection string
+      end-to-end. See [Troubleshooting — Plan B](docs/01-getting-started/04-troubleshooting.md)
+- [ ] Review the speaker notes for the four hands-on moments
+      (Lab Setup Check, CRUD, Querying & Indexing, Security Hardening)
 
 ## Day Of — Morning Block
 
@@ -83,6 +89,16 @@ Before announcing each exercise, confirm:
 - [ ] You have walked the room at least once during the previous module
 - [ ] You know which participants are ahead and which are behind
 - [ ] The relevant lab guide is already open on the projector
+
+## When a Participant Is Stuck on Setup
+
+If after 10 minutes Docker still won't start, switch to a backup plan
+instead of letting them stall the whole session
+(see [Troubleshooting](docs/01-getting-started/04-troubleshooting.md)):
+
+- [ ] **Plan A** — pair them with someone whose Docker works; they type, peer hosts
+- [ ] **Plan B** — switch them to your pre-staged MongoDB Atlas M0 cluster
+- [ ] **Plan C** — move them to a venue/spare workstation if available
 
 ## Post-Training (Within 48 Hours)
 

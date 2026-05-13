@@ -92,10 +92,15 @@ data visually — but the exercises are designed for `mongosh`.
 
 | Symptom | Likely Cause | Fix |
 |---------|--------------|-----|
+| Docker Desktop won't start at all | Hardware virtualization disabled in BIOS | See [Troubleshooting](04-troubleshooting.md) — Layer 1 |
+| `WSL 2 installation is incomplete` (Windows) | Windows features not enabled | See [Troubleshooting](04-troubleshooting.md) — Layer 2 |
 | `Bind for 0.0.0.0:27017 failed: port is already allocated` | Another MongoDB is running | `lsof -i :27017` then stop the process |
 | `mongo-express` keeps restarting | `mongo-lab` isn't healthy yet | Wait 10s and refresh; check `docker logs mongo-lab` |
 | `Authentication failed` in mongosh | Wrong username/password or typed `ChangeMe123` without `!` | Re-check the command; the `!` is part of the password |
 | Slow `docker compose up` first time | Image pull on slow network | Run it before the session, not during it |
+
+For deeper diagnosis (especially the virtualization stack), see the
+[full Troubleshooting guide](04-troubleshooting.md).
 
 ## Next Steps
 

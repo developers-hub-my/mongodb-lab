@@ -11,6 +11,23 @@ Docker, a terminal, and a modern web browser.
 | A terminal (Terminal.app, iTerm2, Windows Terminal, GNOME Terminal) | -- | Driving `docker` and `mongosh` |
 | A web browser (Chrome, Firefox, Safari, Edge) | Current | Accessing mongo-express at `http://localhost:8081` |
 
+## Hardware Virtualization
+
+Docker needs **hardware virtualization (Intel VT-x / AMD-V)** enabled at the
+BIOS / UEFI level. On many corporate laptops this is **disabled by default**
+and is the single most common reason Docker won't start on training day.
+
+Confirm it before the session:
+
+- **Windows**: open **Task Manager → Performance → CPU**. The bottom of the
+  panel must say `Virtualization: Enabled`.
+- **macOS**: Apple Silicon has virtualization always on. Intel Macs:
+  `sysctl kern.hv_support` — must return `1`.
+- **Linux**: `lscpu | grep Virtualization` — must show `VT-x` or `AMD-V`.
+
+If `Disabled`, follow [Troubleshooting](04-troubleshooting.md) **before** the
+training day. Resolving BIOS settings often needs IT support, so allow time.
+
 ## Verification
 
 Open a terminal and run:
@@ -63,3 +80,4 @@ training day, not during the first break.
 ## Next Steps
 
 - [Lab Setup](02-lab-setup.md) — bring up the stack and connect
+- [Troubleshooting](04-troubleshooting.md) — if Docker won't start

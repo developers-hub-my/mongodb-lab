@@ -19,6 +19,12 @@ mongosh and mongo-express.
 Import `books.json`, `products.json`, and `users.json` into the `library` database
 ready for the Module 2 exercises.
 
+### [4. Troubleshooting](04-troubleshooting.md)
+
+When Docker won't start (usually a BIOS virtualization issue), Windows
+features aren't enabled, or hypervisors conflict. Includes day-of backup
+plans for stuck participants.
+
 ## Related Documentation
 
 - [Exercises](../02-exercises/README.md) — what you'll do once the lab is running
