@@ -71,6 +71,79 @@ db.books.countDocuments({ genre: "Programming" })
 | `$and` / `$or` | Logical combine | `{ $or: [ { year: 1949 }, { year: 1965 } ] }` |
 | `$regex` | Pattern match | `{ title: { $regex: "^The" } }` |
 
+## MongoDB ↔ SQL
+
+If you already think in SQL, use this section to translate. The mental
+model maps cleanly for most read/write patterns — the genuine divergences
+are JOINs and full-document replace, called out at the end.
+
+### Worked Example — Pagination
+
+A typical "newest Fiction books, page 2 of 10 per page" query:
+
+```javascript
+db.books.find({ genre: "Fiction" }).sort({ year: -1 }).skip(5).limit(10)
+```
+
+```sql
+SELECT *
+FROM books
+WHERE genre = 'Fiction'
+ORDER BY year DESC
+LIMIT 10 OFFSET 5;
+```
+
+Piece by piece:
+
+| MongoDB | SQL |
+|---------|-----|
+| `db.books` | `FROM books` |
+| `.find({ genre: "Fiction" })` | `WHERE genre = 'Fiction'` (with implicit `SELECT *`) |
+| `.sort({ year: -1 })` | `ORDER BY year DESC` |
+| `.skip(5)` | `OFFSET 5` |
+| `.limit(10)` | `LIMIT 10` |
+
+### Translation Table — Common Patterns
+
+| SQL | MongoDB |
+|-----|---------|
+| `SELECT * FROM books` | `db.books.find()` |
+| `SELECT title, year FROM books` | `db.books.find({}, { title: 1, year: 1, _id: 0 })` |
+| `WHERE year = 2008` | `{ year: 2008 }` |
+| `WHERE year > 2010` | `{ year: { $gt: 2010 } }` |
+| `WHERE genre IN ('Fiction', 'History')` | `{ genre: { $in: ["Fiction", "History"] } }` |
+| `WHERE title LIKE 'The%'` | `{ title: { $regex: "^The" } }` |
+| `ORDER BY year DESC` | `.sort({ year: -1 })` |
+| `LIMIT 10` | `.limit(10)` |
+| `LIMIT 10 OFFSET 5` | `.skip(5).limit(10)` |
+| `SELECT COUNT(*) FROM books` | `db.books.countDocuments()` |
+| `SELECT DISTINCT genre FROM books` | `db.books.distinct("genre")` |
+| `GROUP BY genre` | `db.books.aggregate([{ $group: { _id: "$genre", n: { $sum: 1 } } }])` |
+| `INNER JOIN authors ON ...` | Embedded subdocument, **or** `$lookup` in aggregation |
+| `INSERT INTO books (...) VALUES (...)` | `db.books.insertOne({ ... })` |
+| `UPDATE books SET price = 90 WHERE title = 'X'` | `db.books.updateOne({ title: "X" }, { $set: { price: 90 } })` |
+| `DELETE FROM books WHERE title = 'X'` | `db.books.deleteOne({ title: "X" })` |
+| `CREATE INDEX idx_author ON books(author)` | `db.books.createIndex({ author: 1 })` |
+| `CREATE UNIQUE INDEX idx_email ON users(email)` | `db.users.createIndex({ email: 1 }, { unique: true })` |
+
+### Where the Model Genuinely Diverges
+
+**JOINs aren't free in MongoDB.**
+
+> There's no foreign-key join engine. You either **embed** the related data
+> in the same document (preferred for 1-to-few relationships read together)
+> or use **`$lookup`** in an aggregation pipeline (for many-to-many or
+> rarely-joined data). Heavy `$lookup` usage usually means the schema should
+> be reconsidered — that workload may belong in a relational database.
+
+**Update without a `$` operator replaces the whole document.**
+
+> `db.books.updateOne({...}, { newDoc })` **without** `$set`, `$inc`,
+> `$push`, etc. replaces the entire document. There's no real SQL analogue
+> — the closest would be a destructive full-row rewrite that drops every
+> column you didn't list. Always use update operators unless you genuinely
+> intend a wholesale replace.
+
 ## Update
 
 ```javascript
