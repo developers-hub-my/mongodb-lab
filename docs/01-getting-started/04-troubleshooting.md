@@ -236,6 +236,114 @@ sudo systemctl enable --now mongod
 mongosh
 ```
 
+#### Opening mongosh After Install
+
+The MSI / Homebrew / apt install registers MongoDB as a background service.
+The shell, `mongosh`, is a separate command you run from a terminal. After
+install, here's how to actually get to a working `>` prompt.
+
+##### Windows
+
+1. Press **Win + X** → click **Terminal** (or **Windows PowerShell**).
+   Alternatively, search "Terminal" or "PowerShell" in the Start menu.
+2. Type `mongosh` and press Enter:
+
+   ```powershell
+   mongosh
+   ```
+
+3. You should see something like:
+
+   ```text
+   Current Mongosh Log ID: 65f1a2...
+   Connecting to:          mongodb://127.0.0.1:27017/
+   Using MongoDB:          7.0.x
+   test>
+   ```
+
+   The `test>` prompt confirms you're in. Skip to
+   [First Verification Commands](#first-verification-commands) below.
+
+**If you see `mongosh: The term 'mongosh' is not recognized...`** — the
+binary is installed but not on `PATH`. Two fixes:
+
+| Fix | How |
+|-----|-----|
+| Run with the full path | `& "C:\Program Files\MongoDB\Server\7.0\bin\mongosh.exe"` |
+| Add MongoDB to PATH | Win + X → System → Advanced system settings → Environment Variables → edit **Path** under "User variables" → New → `C:\Program Files\MongoDB\Server\7.0\bin` → OK. Close and reopen the terminal. |
+
+The standalone `mongosh` download installs to a different path — usually
+`C:\Users\<you>\AppData\Local\Programs\mongosh\` — and its installer adds
+itself to `PATH` automatically. If you installed Server-only without the
+shell, download `mongosh` separately:
+<https://www.mongodb.com/try/download/shell>
+
+##### macOS
+
+1. Open **Terminal** (Cmd + Space → "Terminal").
+2. Run:
+
+   ```bash
+   mongosh
+   ```
+
+If you installed via Homebrew (`brew install mongodb-community@7.0`),
+`mongosh` is on `PATH` automatically. If not, install it:
+
+```bash
+brew install mongosh
+```
+
+##### Linux
+
+1. Open a terminal (Ctrl + Alt + T on most distros).
+2. Run:
+
+   ```bash
+   mongosh
+   ```
+
+The `mongodb-org` apt meta-package pulls in `mongosh`. On distros where it
+doesn't, install separately following
+<https://www.mongodb.com/docs/mongodb-shell/install/>.
+
+##### First Verification Commands
+
+Once you're at the `test>` prompt, confirm the engine is healthy and the
+shell can read data:
+
+```javascript
+// Is the database alive?
+db.runCommand({ ping: 1 })
+// { ok: 1 }
+
+// What databases exist? (admin, config, local on a fresh install)
+show dbs
+
+// Switch to the lab database (created lazily on first write)
+use library
+
+// You're ready — load sample data, then move to the exercises
+```
+
+##### Exiting mongosh
+
+| Action | Keys |
+|--------|------|
+| Clean exit | `.exit` then Enter |
+| Quick exit | `Ctrl + D` |
+| Cancel a long-running command | `Ctrl + C` (returns to prompt, doesn't quit) |
+
+Quitting `mongosh` does **not** stop the MongoDB service — the database
+keeps running in the background. To stop the engine itself, use the OS
+service controls:
+
+| OS | Stop the engine |
+|----|-----------------|
+| Windows (Admin PowerShell) | `Stop-Service MongoDB` |
+| macOS | `brew services stop mongodb-community@7.0` |
+| Linux | `sudo systemctl stop mongod` |
+
 #### Default Authentication (or Lack of It)
 
 The most common confusion right after a native install: **what's the default
