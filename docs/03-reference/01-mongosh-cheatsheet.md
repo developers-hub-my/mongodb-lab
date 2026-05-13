@@ -37,25 +37,83 @@ db.books.insertMany([
 
 ## Read
 
+### Basics
+
 ```javascript
-// Find all
+// Find everything
 db.books.find()
 
-// Filter
-db.books.find({ year: { $gt: 2010 } })
-
-// Project — return only certain fields
-db.books.find({}, { title: 1, year: 1, _id: 0 })
-
-// Sort, skip, limit
-db.books.find().sort({ year: -1 }).skip(0).limit(5)
-
-// Single document
+// Find one document (returns the doc, not a cursor)
 db.books.findOne({ title: "Clean Code" })
 
-// Count
+// Find with a filter
+db.books.find({ author: "George Orwell" })
+```
+
+`find()` returns a **cursor** that you iterate to get results. `findOne()`
+returns a **single document** (or `null` if no match) — handy when you know
+there's only one or you want the first.
+
+### Comparison Operators
+
+```javascript
+db.books.find({ year: { $gt: 2000 } })                           // published after 2000
+db.books.find({ price: { $lte: 50 } })                           // RM 50 or less
+db.books.find({ genre: { $in: ["Fiction", "History"] } })        // either genre
+```
+
+### Combining Conditions (Implicit AND)
+
+Multiple fields in the same filter object are joined with **AND**
+automatically — no `$and` needed in the common case.
+
+```javascript
+// Programming books published in 2010 or later
+db.books.find({ genre: "Programming", year: { $gte: 2010 } })
+```
+
+Use `$or` explicitly when you want logical OR:
+
+```javascript
+db.books.find({ $or: [ { year: 1949 }, { year: 1965 } ] })
+```
+
+### Projection — Choose Which Fields to Return
+
+```javascript
+// Only the title and author; suppress _id
+db.books.find(
+  { genre: "Programming" },
+  { title: 1, author: 1, _id: 0 }
+)
+```
+
+The second argument controls fields: `1` includes, `0` excludes. The `_id`
+field is included by default — set `_id: 0` to drop it.
+
+### Sort, Skip, Limit
+
+Chain these onto a cursor to shape the result set. Order of method calls
+doesn't matter to MongoDB — but `sort` must come before `skip`/`limit`
+mentally, because you almost always want to paginate **sorted** results.
+
+```javascript
+db.books.find({ genre: "Fiction" })
+  .sort({ year: -1 })          // newest first (-1 desc, 1 asc)
+  .skip(5)                     // skip the first 5
+  .limit(10)                   // return the next 10
+```
+
+This is the standard "page 2 of 10 per page, newest first" pattern.
+
+### Count
+
+```javascript
 db.books.countDocuments({ genre: "Programming" })
 ```
+
+Use `countDocuments(filter)` rather than the deprecated `count()`. For an
+unfiltered total, pass `{}` or omit the argument: `db.books.countDocuments()`.
 
 ## Query Operators
 
