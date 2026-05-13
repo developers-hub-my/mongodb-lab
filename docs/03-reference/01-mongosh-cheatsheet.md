@@ -3,7 +3,13 @@
 The commands used during the session, grouped by purpose. Keep this nearby
 when you're working through the exercises or building your own queries.
 
+Each section below is **collapsible** — click the section header (or its
+triangle) to fold it away once you're done with it.
+
 ## Connecting
+
+<details open>
+<summary>**How to open a mongosh prompt against the lab or a remote MongoDB**</summary>
 
 ```bash
 # From your laptop into the lab container
@@ -13,7 +19,15 @@ docker exec -it mongo-lab mongosh -u admin -p 'ChangeMe123!'
 mongosh "mongodb://user:pass@host:27017/dbname?authSource=admin"
 ```
 
+Native install? See
+[Opening mongosh After Install](../01-getting-started/04-troubleshooting.md#opening-mongosh-after-install).
+
+</details>
+
 ## Database and Collection Basics
+
+<details open>
+<summary>**Inspect databases and collections, drop them, count docs**</summary>
 
 | Command | Purpose |
 |---------|---------|
@@ -24,7 +38,12 @@ mongosh "mongodb://user:pass@host:27017/dbname?authSource=admin"
 | `db.books.drop()` | Delete a collection |
 | `db.dropDatabase()` | Delete the current database (requires `dbOwner` role) |
 
+</details>
+
 ## Create
+
+<details open>
+<summary>**Insert one or many documents**</summary>
 
 ```javascript
 db.books.insertOne({ title: "Clean Code", year: 2008 })
@@ -35,7 +54,16 @@ db.books.insertMany([
 ])
 ```
 
+`_id` is auto-generated as an `ObjectId` if you don't provide one.
+`insertMany` is ordered by default — pass `{ ordered: false }` to continue
+past errors, useful for bulk imports.
+
+</details>
+
 ## Read
+
+<details open>
+<summary>**Finding documents, filtering, sorting, projecting, paginating**</summary>
 
 ### Basics
 
@@ -115,7 +143,12 @@ db.books.countDocuments({ genre: "Programming" })
 Use `countDocuments(filter)` rather than the deprecated `count()`. For an
 unfiltered total, pass `{}` or omit the argument: `db.books.countDocuments()`.
 
+</details>
+
 ## Query Operators
+
+<details open>
+<summary>**Reference table of the operators you'll use most**</summary>
 
 | Operator | Meaning | Example |
 |----------|---------|---------|
@@ -129,7 +162,12 @@ unfiltered total, pass `{}` or omit the argument: `db.books.countDocuments()`.
 | `$and` / `$or` | Logical combine | `{ $or: [ { year: 1949 }, { year: 1965 } ] }` |
 | `$regex` | Pattern match | `{ title: { $regex: "^The" } }` |
 
+</details>
+
 ## MongoDB ↔ SQL
+
+<details open>
+<summary>**Side-by-side translation for SQL-familiar participants**</summary>
 
 If you already think in SQL, use this section to translate. The mental
 model maps cleanly for most read/write patterns — the genuine divergences
@@ -202,37 +240,162 @@ Piece by piece:
 > column you didn't list. Always use update operators unless you genuinely
 > intend a wholesale replace.
 
+</details>
+
 ## Update
+
+<details open>
+<summary>**Modifying documents — always lead with a $ operator**</summary>
+
+### Update One Document
+
+```javascript
+// Update one document — must use an operator like $set
+db.books.updateOne(
+  { title: "Clean Code" },
+  { $set: { price: 79.90 } }
+)
+```
+
+`updateOne` modifies the **first** document matching the filter. If multiple
+documents could match and you want all of them, use `updateMany`.
+
+### Update Many Documents
+
+```javascript
+// Apply the same change to every match
+db.books.updateMany(
+  { genre: "Programming" },
+  { $inc: { stock: 5 } }
+)
+```
+
+### Common Update Operators
+
+| Operator | What it does |
+|----------|--------------|
+| `$set` | Set or change a field |
+| `$unset` | Remove a field |
+| `$inc` | Increment a number (negative value decrements) |
+| `$mul` | Multiply a number |
+| `$rename` | Rename a field |
+| `$push` | Append a value to an array |
+| `$pull` | Remove matching values from an array |
+| `$addToSet` | Append to an array only if the value isn't already there |
+
+### Worked Examples
 
 ```javascript
 // Set or change a field
-db.books.updateOne({ title: "Clean Code" }, { $set: { price: 90.00 } })
+db.books.updateOne(
+  { title: "Clean Code" },
+  { $set: { price: 79.90 } }
+)
 
 // Increment / multiply numeric fields
-db.books.updateMany({ genre: "Self-Help" }, { $mul: { price: 0.9 } })
-db.products.updateOne({ sku: "PH-002" }, { $inc: { stock: -1 } })
+db.books.updateMany(
+  { genre: "Self-Help" },
+  { $mul: { price: 0.9 } }
+)
+
+db.products.updateOne(
+  { sku: "PH-002" },
+  { $inc: { stock: -1 } }     // decrement stock by 1
+)
 
 // Append to an array
-db.books.updateMany({ year: { $lt: 1970 } }, { $push: { tags: "classic" } })
+db.books.updateMany(
+  { year: { $lt: 1970 } },
+  { $push: { tags: "classic" } }
+)
 
 // Remove a field
-db.books.updateOne({ title: "Clean Code" }, { $unset: { price: "" } })
+db.books.updateOne(
+  { title: "Clean Code" },
+  { $unset: { price: "" } }   // value is ignored; field is removed
+)
+
+// Rename a field across every document in a collection
+db.books.updateMany(
+  {},
+  { $rename: { "pages": "page_count" } }
+)
 ```
 
-> **Warning**: `updateOne({...}, { newDoc })` (without a `$` operator) **replaces**
-> the entire document. Always use `$set`, `$inc`, `$push`, `$unset`, etc.
+> **Warning**: `updateOne({...}, { newDoc })` without a `$` operator
+> **replaces the entire document** — every field not in `newDoc` is lost.
+> Always lead with `$set`, `$inc`, `$push`, `$unset`, etc.
+
+</details>
 
 ## Delete
 
+<details open>
+<summary>**Removing documents — always preview with find() first**</summary>
+
+### Delete One Document
+
 ```javascript
-db.books.deleteOne({ title: "Dune" })
-db.books.deleteMany({ available: false })
+// Delete one matching document
+db.books.deleteOne({
+  title: "1984"
+})
 ```
 
-> **Tip**: Always run the same filter through `find()` first to confirm you're
-> about to delete the right documents.
+`deleteOne` removes the **first** document matching the filter, even if
+several match. Use `deleteMany` when you want all matches gone.
+
+### Delete Many Documents
+
+```javascript
+// Delete many matching documents
+db.books.deleteMany({
+  year: { $lt: 1950 }
+})
+```
+
+### Dangerous: Delete All Documents
+
+```javascript
+// Empty filter matches every document
+db.books.deleteMany({})
+```
+
+This empties the collection but keeps the collection itself, its indexes,
+and any validators in place. Useful for "reset all data, keep the schema"
+flows.
+
+### Drop the Whole Collection
+
+```javascript
+// Removes the collection along with its indexes and validators
+db.books.drop()
+```
+
+### Quick Comparison
+
+| Operation | Removes documents? | Removes collection? | Removes indexes? |
+|-----------|--------------------|---------------------|------------------|
+| `deleteOne` / `deleteMany` (with filter) | Yes (matching) | No | No |
+| `deleteMany({})` | Yes (all) | No | No |
+| `drop()` | Yes (all) | Yes | Yes |
+| `dropDatabase()` | Yes (all collections) | Yes (all) | Yes (all) |
+
+> **Tip**: Always preview with `find()` (or `countDocuments`) before
+> running a delete:
+>
+> ```javascript
+> db.books.find({ year: { $lt: 1950 } })       // see what would be deleted
+> db.books.countDocuments({ year: { $lt: 1950 } })  // or just count
+> // Once the count looks right, run the deleteMany
+> ```
+
+</details>
 
 ## Indexes
+
+<details open>
+<summary>**Create, inspect, drop indexes; confirm a query uses one**</summary>
 
 ```javascript
 // Single-field index
@@ -254,7 +417,15 @@ db.books.dropIndex("author_1")
 db.books.find({ author: "Frank Herbert" }).explain("executionStats")
 ```
 
+In the `explain()` output, look for `winningPlan.stage`. `IXSCAN` means
+the index is being used; `COLLSCAN` means a full collection scan.
+
+</details>
+
 ## Aggregation (Preview)
+
+<details open>
+<summary>**Pipeline-style queries — match, group, sort in one pass**</summary>
 
 ```javascript
 db.books.aggregate([
@@ -264,7 +435,16 @@ db.books.aggregate([
 ])
 ```
 
+Each stage feeds the next. Common stages: `$match` (filter), `$group`
+(roll up), `$sort`, `$project` (reshape), `$lookup` (join), `$limit`,
+`$skip`.
+
+</details>
+
 ## User Management
+
+<details open>
+<summary>**Create users, grant least-privilege roles, manage passwords**</summary>
 
 ```javascript
 use admin
@@ -290,7 +470,12 @@ db.changeUserPassword("library_app", passwordPrompt())
 | `readAnyDatabase` | Read every database (cluster-wide) |
 | `root` | Full cluster admin — do not use for apps |
 
+</details>
+
 ## Backup and Restore (Run on the Host)
+
+<details open>
+<summary>**mongodump and mongorestore — full and per-database**</summary>
 
 ```bash
 # Backup all databases
@@ -309,7 +494,15 @@ docker exec mongo-lab mongorestore \
   --db library --drop /backups/library
 ```
 
+For a native install, drop the `docker exec mongo-lab` prefix and run
+`mongodump` / `mongorestore` directly on the host.
+
+</details>
+
 ## Useful Shell Tricks
+
+<details open>
+<summary>**Pretty-print, save results to variables, open editor for long input**</summary>
 
 ```javascript
 // Pretty-print output
@@ -323,6 +516,8 @@ recent.length
 config.set("editor", "vim")
 edit
 ```
+
+</details>
 
 ## Next Steps
 
