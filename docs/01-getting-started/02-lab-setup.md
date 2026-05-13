@@ -94,6 +94,7 @@ data visually — but the exercises are designed for `mongosh`.
 |---------|--------------|-----|
 | Docker Desktop won't start at all | Hardware virtualization disabled in BIOS | See [Troubleshooting](04-troubleshooting.md) — Layer 1 |
 | `WSL 2 installation is incomplete` (Windows) | Windows features not enabled | See [Troubleshooting](04-troubleshooting.md) — Layer 2 |
+| `MongoNetworkError: ECONNREFUSED 127.0.0.1:27017` (native install) | MongoDB service not running | See [Troubleshooting](04-troubleshooting.md#mongonetworkerror-econnrefused-127001-27017) |
 | `Bind for 0.0.0.0:27017 failed: port is already allocated` | Another MongoDB is running | `lsof -i :27017` then stop the process |
 | `mongo-express` keeps restarting | `mongo-lab` isn't healthy yet | Wait 10s and refresh; check `docker logs mongo-lab` |
 | `Authentication failed` in mongosh | Wrong username/password or typed `ChangeMe123` without `!` | Re-check the command; the `!` is part of the password |

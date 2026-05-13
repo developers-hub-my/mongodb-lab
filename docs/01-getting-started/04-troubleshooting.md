@@ -286,6 +286,133 @@ is slightly different:
 - The Exercise 3 "bonus" reflection about `docker-compose.yml` doesn't
   apply — substitute a discussion of `mongod.conf` hardening instead.
 
+#### "MongoNetworkError: ECONNREFUSED 127.0.0.1:27017"
+
+This is the most common stumble on a native install. It means `mongosh`
+runs fine, but **nothing is listening on port 27017** — the database engine
+itself isn't running. Three root causes, in order of frequency:
+
+##### Cause 1 — Only `mongosh` was installed, not MongoDB Server
+
+The `mongosh` shell is shipped as a separate download from the database
+engine. Installing only the shell gives you a working client with nothing
+to connect to.
+
+**Diagnose (Windows, PowerShell):**
+
+```powershell
+Get-Service -Name MongoDB
+# If: "Cannot find any service with service name 'MongoDB'"
+# -> only the shell is installed
+```
+
+**Diagnose (macOS):**
+
+```bash
+brew services list | grep mongodb
+# If empty, the server formula isn't installed
+```
+
+**Diagnose (Linux):**
+
+```bash
+systemctl status mongod
+# If: "Unit mongod.service could not be found"
+```
+
+**Fix**: install **MongoDB Community Server** from
+<https://www.mongodb.com/try/download/community>. On the Windows MSI, tick
+**"Install MongoDB as a Service"** during setup — without that tick, the
+engine is installed but never started.
+
+##### Cause 2 — Server installed but the service is stopped
+
+The engine is installed, but the service hasn't started — either it crashed
+or "Run service on completion" was unticked during install.
+
+**Diagnose (Windows, PowerShell):**
+
+```powershell
+Get-Service MongoDB
+# Status: Stopped
+```
+
+**Start it (PowerShell as Administrator):**
+
+```powershell
+Start-Service MongoDB
+Get-Service MongoDB   # Status: Running
+```
+
+Or from elevated `cmd`: `net start MongoDB`.
+
+**Start it (macOS):**
+
+```bash
+brew services start mongodb-community@7.0
+brew services list   # mongodb-community@7.0 should be 'started'
+```
+
+**Start it (Linux):**
+
+```bash
+sudo systemctl enable --now mongod
+systemctl status mongod   # active (running)
+```
+
+##### Cause 3 — Service starts then immediately crashes
+
+The service registers, you try to start it, but it stops within seconds. The
+log file tells you why.
+
+**Read the log (Windows):**
+
+```powershell
+Get-Content "C:\Program Files\MongoDB\Server\7.0\log\mongod.log" -Tail 30
+```
+
+**Read the log (macOS):**
+
+```bash
+tail -n 30 /opt/homebrew/var/log/mongodb/mongo.log
+# or /usr/local/var/log/mongodb/mongo.log on Intel Macs
+```
+
+**Read the log (Linux):**
+
+```bash
+sudo journalctl -u mongod -n 30 --no-pager
+# or
+sudo tail -n 30 /var/log/mongodb/mongod.log
+```
+
+Look for `ERROR` or `FATAL` lines. The common culprits:
+
+| Log message | Cause | Fix |
+|-------------|-------|-----|
+| `NonExistentPath: Data directory ... not found` | `dbPath` directory missing | Create the folder shown in the error (Windows default: `C:\data\db`) or fix `dbPath` in `mongod.cfg` |
+| `Permission denied` on `dbPath` | Service user can't write to the data folder | Re-run the MSI choosing "Network Service" user, or `chown` the folder to `mongod` on Linux |
+| `Address already in use` / port `27017` in use | Another process owns the port | Windows: `netstat -ano \| findstr :27017` then stop that PID. Mac/Linux: `lsof -i :27017` |
+| `Insufficient free space` | Disk is full or `wiredTiger` can't allocate | Free disk space, then restart the service |
+
+##### Verify the Fix
+
+Once the service is running:
+
+```bash
+mongosh
+```
+
+You should land at a `>` prompt with no error. Confirm the engine answers:
+
+```javascript
+db.runCommand({ ping: 1 })
+// { ok: 1 }
+```
+
+That `ok: 1` is the green light — you can now load the sample data and
+move on to the exercises.
+
 ## Other Common Issues
 
 | Symptom | Cause | Fix |
