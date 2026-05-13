@@ -18,6 +18,16 @@ exercise of the day — pair up if possible.
   Exercises 1 and 2
 - `mongosh` open as `admin`
 
+## Tasks at a Glance
+
+1. [Create a `library_app` user with `readWrite` on the `library` database](#task-1--create-a-readwrite-app-user)
+2. [Create an `analytics_ro` user with read-only access](#task-2--create-a-read-only-analytics-user)
+3. [Authenticate as `library_app` and confirm you can write — but can't drop the database](#task-3--authenticate-as-library_app-and-prove-the-boundary)
+4. [Authenticate as `analytics_ro` and confirm a write attempt fails](#task-4--authenticate-as-analytics_ro-and-prove-the-boundary)
+5. [Take a `mongodump` of the `library` database to `/backups`](#task-5--take-a-mongodump-backup)
+6. [Drop the `books` collection — then restore it from your backup](#task-6--drop-the-books-collection-then-restore-from-backup)
+7. **Bonus**: [review `docker-compose.yml` — list 3 things you'd change for production](#bonus--review-docker-composeyml)
+
 ## Tasks
 
 ### Task 1 — Create a Read/Write App User
